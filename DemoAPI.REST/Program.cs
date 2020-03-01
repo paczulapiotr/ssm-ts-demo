@@ -21,7 +21,8 @@ namespace GRPC.API
                 {
                     webBuilder.UseStartup<Startup>();
 
-                    var host = "http://localhost:5000";
+                    webBuilder.UseKestrel();
+                    var host = "https://localhost:5000";
                     webBuilder.UseUrls(host);
                 });
     }

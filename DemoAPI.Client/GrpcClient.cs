@@ -10,7 +10,7 @@ namespace DemoAPI.Client
     {
         public static async Task Run(int quantity)
         {
-            var channel = GrpcChannel.ForAddress("");
+            var channel = GrpcChannel.ForAddress("https://localhost:5001");
             var weatherForecastClient = new WeatherForecast.WeatherForecastClient(channel);
             var streamingResult = weatherForecastClient.GetForecastInfo(new GetForecastRequest
             {

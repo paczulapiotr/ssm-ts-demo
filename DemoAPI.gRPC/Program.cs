@@ -18,7 +18,7 @@ namespace DemoAPI.gRPC
                 {
                     webBuilder.UseStartup<Startup>();
 
-                    var host = "http://localhost:5001";
+                    var host = "https://localhost:5001";
                     webBuilder.UseUrls(host);
                 });
     }

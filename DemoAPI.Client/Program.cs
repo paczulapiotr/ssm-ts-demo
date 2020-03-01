@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using DemoAPI.Client;
 
 namespace DemoAPI.ClientAPI
@@ -8,12 +9,10 @@ namespace DemoAPI.ClientAPI
         static void Main(string[] args)
         {
             Console.WriteLine("Client started...");
-            Console.WriteLine("A - for API client");
-            Console.WriteLine("G - for grpc client");
-            Console.WriteLine("Q - for quitting");
             var quit = false;
             while (!quit)
             {
+                DisplayMenuOptions();
                 var keyInfo = Console.ReadKey();
                 Console.WriteLine();
                 switch (keyInfo.Key)
@@ -33,10 +32,19 @@ namespace DemoAPI.ClientAPI
                     default:
                         break;
                 }
+                Console.ReadKey();
             }
 
             Console.WriteLine("Client stopped...");
             Console.ReadKey();
+        }
+
+        private static void DisplayMenuOptions()
+        {
+            Console.Clear();
+            Console.WriteLine("A - for API client");
+            Console.WriteLine("G - for grpc client");
+            Console.WriteLine("Q - for quitting");
         }
 
         static void RunGrpcClient()
@@ -47,7 +55,7 @@ namespace DemoAPI.ClientAPI
 
             if (int.TryParse(dataQuantityString, out int result))
             {
-                GrpcClient.Run(result).Wait();
+                MeasureTime(()=>GrpcClient.Run(result).Wait());
             }
             else
             {
@@ -63,12 +71,20 @@ namespace DemoAPI.ClientAPI
 
             if (int.TryParse(dataQuantityString, out int result))
             {
-                APIClient.Run(result).Wait();
+                MeasureTime(()=>APIClient.Run(result).Wait());
             }
             else
             {
                 Console.WriteLine("Incorrect data...");
             }
+        }
+
+        static void MeasureTime(Action action)
+        {
+            var timer = Stopwatch.StartNew();
+            action();
+            timer.Stop();
+            Console.WriteLine($"Time elapsed: {timer.ElapsedMilliseconds}ms");
         }
 
     }

@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace GRPC.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/[controller]")]
     public class WeatherForecastController : ControllerBase
     {
   

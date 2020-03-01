@@ -13,7 +13,7 @@ namespace DemoAPI.Client
         {
 
             var client = new HttpClient();
-            var result = await client.GetAsync($"http://localhost:5000/WeatherForecast/{quantity}");
+            var result = await client.GetAsync($"https://localhost:5000/WeatherForecast/{quantity}");
             if (result.IsSuccessStatusCode)
             {
 
