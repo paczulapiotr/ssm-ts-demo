@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DemoAPI.Common;
+using DemoAPI.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -11,10 +13,7 @@ namespace GRPC.API.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+  
 
         private readonly ILogger<WeatherForecastController> _logger;
 
@@ -23,17 +22,22 @@ namespace GRPC.API.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpGet("{quantity}")]
+        public Task<IEnumerable<WeatherForecast>> Get(int quantity)
         {
             var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            var temperature = rng.Next(-20, 55);
+
+            return Task.FromResult(ForecastFactory.Create(quantity).Select(f =>
             {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+                return new WeatherForecast
+                {
+                    Date = f.date,
+                    TemperatureC = f.temperatureC,
+                    Summary = f.summary,
+                    CanYouPlayGolf = f.canYouPlayGolf
+                };
+            }));
         }
     }
 }
