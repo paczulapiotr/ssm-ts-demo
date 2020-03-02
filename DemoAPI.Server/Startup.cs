@@ -1,3 +1,4 @@
+using DemoAPI.Server.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +19,7 @@ namespace GRPC.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddGrpc();
             services.AddControllers();
         }
 
@@ -28,13 +30,10 @@ namespace GRPC.API
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseRouting();
-
-            app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGrpcService<WeatherForecastService>();
                 endpoints.MapControllers();
             });
         }

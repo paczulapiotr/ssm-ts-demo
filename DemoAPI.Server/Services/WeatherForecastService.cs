@@ -1,11 +1,10 @@
-using System.Linq;
 using System.Threading.Tasks;
 using DemoAPI.Common;
+using DemoAPI.gRPC;
 using Grpc.Core;
 
-namespace DemoAPI.gRPC
+namespace DemoAPI.Server.Services
 {
-
 	public class WeatherForecastService : WeatherForecast.WeatherForecastBase
 	{
 		public WeatherForecastService()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DemoAPI.Common;
 using DemoAPI.Common.Models;
 using Newtonsoft.Json;
 
@@ -13,7 +14,12 @@ namespace DemoAPI.Client
         {
 
             var client = new HttpClient();
-            var result = await client.GetAsync($"https://localhost:5000/WeatherForecast/{quantity}");
+            var req = new HttpRequestMessage(HttpMethod.Get, $"{Configuration.UrlForClient}/WeatherForecast/{quantity}")
+            {
+                Version = new Version(2, 0)
+            };
+
+            var result = await client.SendAsync(req);
             if (result.IsSuccessStatusCode)
             {
 

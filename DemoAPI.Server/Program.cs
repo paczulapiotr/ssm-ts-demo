@@ -1,15 +1,11 @@
-using System;
+using DemoAPI.Common;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
-
 namespace GRPC.API
 {
     public class Program
     {
-
-        public static string HOSTING_URL
-            => Environment.GetEnvironmentVariable("HOSTING_URL");
-
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
@@ -20,9 +16,8 @@ namespace GRPC.API
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-
-                    webBuilder.UseKestrel();
-                    var host = "https://localhost:5000";
+                    webBuilder.UseKestrel(opts => opts.ConfigureEndpointDefaults(o => o.Protocols = HttpProtocols.Http2));
+                    var host = Configuration.UrlForServer ?? "https://+:5000";
                     webBuilder.UseUrls(host);
                 });
     }

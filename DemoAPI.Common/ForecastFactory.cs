@@ -18,7 +18,7 @@ namespace DemoAPI.Common
             foreach (var index in Enumerable.Range(0, quantity))
             {
                 var temperature = rng.Next(-20, 55);
-                Task.Delay(1000).Wait();
+                Task.Delay(300).Wait();
                 yield return
                     (
                     date: DateTime.Now.AddDays(index).Date.ToShortDateString(),

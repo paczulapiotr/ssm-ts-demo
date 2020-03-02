@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DemoAPI.Common;
 using DemoAPI.gRPC;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -10,7 +11,7 @@ namespace DemoAPI.Client
     {
         public static async Task Run(int quantity)
         {
-            var channel = GrpcChannel.ForAddress("https://localhost:5001");
+            var channel = GrpcChannel.ForAddress(Configuration.UrlForClient);
             var weatherForecastClient = new WeatherForecast.WeatherForecastClient(channel);
             var streamingResult = weatherForecastClient.GetForecastInfo(new GetForecastRequest
             {

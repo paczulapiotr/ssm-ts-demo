@@ -5,7 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.23.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DemoAPI.Common\DemoAPI.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\DemoAPI.Common\Protos\weatherforecast.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
