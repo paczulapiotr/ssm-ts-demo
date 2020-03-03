@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using DemoAPI.Common;
@@ -13,7 +14,7 @@ namespace GRPC.API.Controllers
     [Route("/[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-  
+
 
         private readonly ILogger<WeatherForecastController> _logger;
 
@@ -28,7 +29,7 @@ namespace GRPC.API.Controllers
             var rng = new Random();
             var temperature = rng.Next(-20, 55);
 
-            return Task.FromResult(ForecastFactory.Create(quantity).Select(f =>
+            return Task.FromResult(ForecastFactory.CreateMultiple(quantity).Select(f =>
             {
                 return new WeatherForecast
                 {
@@ -38,6 +39,24 @@ namespace GRPC.API.Controllers
                     CanYouPlayGolf = f.canYouPlayGolf
                 };
             }));
+        }
+
+
+        [HttpGet]
+        public Task<WeatherForecast> GetForDate(string date)
+        {
+            var parsedDate = DateParserHelper.Parse(date);
+
+            var forecast = ForecastFactory.Create(parsedDate);
+
+            return Task.FromResult(
+                new WeatherForecast
+                {
+                    Date = forecast.date,
+                    TemperatureC = forecast.temperatureC,
+                    Summary = forecast.summary,
+                    CanYouPlayGolf = forecast.canYouPlayGolf
+                });
         }
     }
 }

@@ -4,10 +4,15 @@ option csharp_namespace = "DemoAPI.gRPC";
 
 service WeatherForecast {
 	rpc GetForecastInfo (GetForecastRequest) returns (stream ForecastResult);
+	rpc GetForecastForDateInfo (GetForecastForDateRequest) returns (ForecastResult);
 }
 
 message GetForecastRequest {
     int32 forecastDaysQuantity = 1;
+}
+
+message GetForecastForDateRequest {
+    string date = 1;
 }
 
 message ForecastResult {

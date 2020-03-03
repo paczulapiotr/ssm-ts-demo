@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using DemoAPI.Client;
+using DemoAPI.Common;
 
 namespace DemoAPI.ClientAPI
 {
@@ -21,12 +23,20 @@ namespace DemoAPI.ClientAPI
                         quit = true;
                         break;
 
-                    case ConsoleKey.G:
-                        RunGrpcClient();
+                    case ConsoleKey.D1:
+                        RESTFutureForecast();
                         break;
 
-                    case ConsoleKey.A:
-                        RunAPIClient();
+                    case ConsoleKey.D2:
+                        GrpcFutureForecast();
+                        break;
+
+                    case ConsoleKey.D3:
+                        RESTForecastForDay();
+                        break;
+
+                    case ConsoleKey.D4:
+                        GrpcForecastForDay();
                         break;
 
                     default:
@@ -42,12 +52,22 @@ namespace DemoAPI.ClientAPI
         private static void DisplayMenuOptions()
         {
             Console.Clear();
-            Console.WriteLine("A - for API client");
-            Console.WriteLine("G - for grpc client");
+            Console.WriteLine("1 - (REST) Forecast for several days");
+            Console.WriteLine("2 - (gRPC) Forecast for several days");
+            Console.WriteLine("3 - (REST) Forecast for a specific day");
+            Console.WriteLine("4 - (gRPC) Forecast for a specific day");
             Console.WriteLine("Q - for quitting");
         }
 
-        static void RunGrpcClient()
+        static void GrpcFutureForecast() => FutureForecastBase(GrpcClient.GetMultipleForecasts);
+
+        static void RESTFutureForecast() => FutureForecastBase(RESTClient.GetMultipleForecasts);
+
+        static void RESTForecastForDay() => ForecastForDayBase(RESTClient.GetForecastForDate);
+
+        static void GrpcForecastForDay() => ForecastForDayBase(GrpcClient.GetForecastForDate);
+
+        private static void FutureForecastBase(Func<int, Task> clientAction)
         {
             Console.WriteLine("Enter forecast quantity...");
             var dataQuantityString = Console.ReadLine();
@@ -55,7 +75,7 @@ namespace DemoAPI.ClientAPI
 
             if (int.TryParse(dataQuantityString, out int result))
             {
-                MeasureTime(()=>GrpcClient.Run(result).Wait());
+                MeasureTime(() => clientAction(result).Wait());
             }
             else
             {
@@ -63,20 +83,12 @@ namespace DemoAPI.ClientAPI
             }
         }
 
-        static void RunAPIClient()
+        private static void ForecastForDayBase(Func<string, Task> clientAction)
         {
-            Console.WriteLine("Enter forecast quantity...");
-            var dataQuantityString = Console.ReadLine();
+            Console.WriteLine($"Enter forecast date with format {Configuration.DateFormat}...");
+            var date = Console.ReadLine();
             Console.WriteLine();
-
-            if (int.TryParse(dataQuantityString, out int result))
-            {
-                MeasureTime(()=>APIClient.Run(result).Wait());
-            }
-            else
-            {
-                Console.WriteLine("Incorrect data...");
-            }
+            MeasureTime(() => clientAction(date).Wait());
         }
 
         static void MeasureTime(Action action)

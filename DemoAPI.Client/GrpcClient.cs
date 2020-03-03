@@ -9,10 +9,9 @@ namespace DemoAPI.Client
 {
     public static class GrpcClient
     {
-        public static async Task Run(int quantity)
+        public static async Task GetMultipleForecasts(int quantity)
         {
-            var channel = GrpcChannel.ForAddress(Configuration.UrlForClient);
-            var weatherForecastClient = new WeatherForecast.WeatherForecastClient(channel);
+            var weatherForecastClient = GetGrpcClient();
             var streamingResult = weatherForecastClient.GetForecastInfo(new GetForecastRequest
             {
                 ForecastDaysQuantity = quantity
@@ -22,8 +21,28 @@ namespace DemoAPI.Client
             while (await responseStream.MoveNext())
             {
                 var result = responseStream.Current;
-                Console.WriteLine($"Date: {result.Date} Temperature: {result.TemperatureC} Summary: {result.Summary} Golfable? {(result.CanYouPlayGolf ? "Yes" : "No")}");
+                ShowForecast(result);
             }
+        }
+
+        private static void ShowForecast(ForecastResult result)
+        {
+            Console.WriteLine($"Date: {result.Date} Temperature: {result.TemperatureC} Summary: {result.Summary} Golfable? {(result.CanYouPlayGolf ? "Yes" : "No")}");
+        }
+
+        public static async Task GetForecastForDate(string date)
+        {
+            var weatherForecastClient = GetGrpcClient();
+            var result = await weatherForecastClient.GetForecastForDateInfoAsync(
+                new GetForecastForDateRequest { Date = date });
+            
+            ShowForecast(result);
+        }
+
+        private static WeatherForecast.WeatherForecastClient GetGrpcClient()
+        {
+            var channel = GrpcChannel.ForAddress(Configuration.UrlForClient);
+            return new WeatherForecast.WeatherForecastClient(channel);
         }
     }
 }
