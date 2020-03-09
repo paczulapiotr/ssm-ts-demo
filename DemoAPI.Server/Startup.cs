@@ -30,7 +30,14 @@ namespace GRPC.API
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseHsts();
+            }
+
             app.UseRouting();
+            app.UseHttpsRedirection();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<WeatherForecastService>();
