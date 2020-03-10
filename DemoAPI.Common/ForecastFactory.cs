@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace DemoAPI.Common
@@ -25,7 +24,7 @@ namespace DemoAPI.Common
         {
             var rng = new Random();
             var temperature = rng.Next(-20, 55);
-            await Task.Delay(700);
+            await Task.Delay(1000);
             return
             (
             date: date.ToShortDateString(),

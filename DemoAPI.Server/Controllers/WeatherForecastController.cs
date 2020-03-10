@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DemoAPI.Common;
 using DemoAPI.Common.Models;
@@ -24,8 +23,6 @@ namespace GRPC.API.Controllers
         [HttpGet("{quantity}")]
         public async IAsyncEnumerable<WeatherForecast> Get(int quantity)
         {
-            var rng = new Random();
-            var temperature = rng.Next(-20, 55);
             await foreach (var f in ForecastFactory.CreateMultipleAsync(quantity))
             {
                 yield return new WeatherForecast

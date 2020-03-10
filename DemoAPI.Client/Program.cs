@@ -69,9 +69,9 @@ namespace DemoAPI.ClientAPI
             Console.WriteLine("3 - (REST) Forecast for a specific day");
             Console.WriteLine("4 - (gRPC) Forecast for a specific day");
             Console.WriteLine("...");
-            Console.WriteLine("5 - (gRPC) Client streaming");
-            Console.WriteLine("6 - (gRPC) Bidirectional streaming");
-            Console.WriteLine("7 - (gRPC) SPAM Bidirectional streaming");
+            Console.WriteLine("5 - (gRPC) Forecast Client streaming");
+            Console.WriteLine("6 - (gRPC) Forecast Bidirectional streaming");
+            Console.WriteLine("7 - (gRPC) Forecast SPAM Bidirectional streaming");
             Console.WriteLine("Q - for quitting");
         }
 
@@ -91,7 +91,7 @@ namespace DemoAPI.ClientAPI
 
             if (int.TryParse(dataQuantityString, out int result))
             {
-                MeasureTime(async () => await clientAction(result));
+                MeasureTime(() => clientAction(result).Wait());
             }
             else
             {
@@ -104,7 +104,7 @@ namespace DemoAPI.ClientAPI
             Console.WriteLine($"Enter forecast date with format {Configuration.DateFormat}...");
             var date = Console.ReadLine();
             Console.WriteLine();
-            MeasureTime(async () => await clientAction(date));
+            MeasureTime(() => clientAction(date).Wait());
         }
 
         static void MeasureTime(Action action)

@@ -26,6 +26,7 @@ namespace DemoAPI.Client
                 ShowForecast(result);
             }
         }
+
         public static async Task PostForecast(int quantity)
         {
             var weatherForecastClient = GetGrpcClient();
@@ -44,8 +45,6 @@ namespace DemoAPI.Client
                 });
             }
             await stream.CompleteAsync();
-            var response = await call.ResponseAsync;
-            Console.WriteLine($"Response: {response}");
         }
 
         public static async Task BidirectionalForecast(int quantity)

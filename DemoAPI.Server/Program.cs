@@ -19,6 +19,7 @@ namespace GRPC.API
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    #region docker settings
                     //    webBuilder.UseKestrel(opts =>
                     //    {
                     //        opts.Listen(IPAddress.Any, Configuration.AppPort,
@@ -33,6 +34,7 @@ namespace GRPC.API
 
                     //    });
                     //    var host = "https://+:" + Configuration.AppPort;
+                    #endregion
                     var host = "https://localhost:" + Configuration.AppPort;
                     webBuilder.UseUrls(host);
 

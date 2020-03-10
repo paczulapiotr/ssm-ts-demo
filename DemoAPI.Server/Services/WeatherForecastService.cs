@@ -1,16 +1,19 @@
-using System;
 using System.Threading.Tasks;
 using DemoAPI.Common;
 using DemoAPI.gRPC;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.Extensions.Logging;
 
 namespace DemoAPI.Server.Services
 {
 	public class WeatherForecastService : WeatherForecast.WeatherForecastBase
 	{
-		public WeatherForecastService()
+		private readonly ILogger<WeatherForecastService> _logger;
+
+		public WeatherForecastService(ILogger<WeatherForecastService> logger)
 		{
+			_logger = logger;
 		}
 
 		public override async Task<ForecastResult> ForecastInfo(GetForecastForDateRequest request, ServerCallContext context)
@@ -46,8 +49,8 @@ namespace DemoAPI.Server.Services
 		{
 			while (await requestStream.MoveNext())
 			{
-				var current = requestStream.Current;
-				Console.WriteLine($"Date: {current.Date}, Temperature: {current.TemperatureC} C, Summary: {current.Summary}, Golfable: {current.CanYouPlayGolf}");
+				var f = requestStream.Current;
+				ShowForecast(f.Date, f.TemperatureC, f.Summary, f.CanYouPlayGolf);
 			}
 
 			return new Empty();
@@ -58,7 +61,7 @@ namespace DemoAPI.Server.Services
 			while (await requestStream.MoveNext())
 			{
 				var current = requestStream.Current;
-				Console.WriteLine($"Request for date: {current.Date}");
+				_logger.LogInformation($"Request for date: {current.Date}");
 
 				var (date, summary, temperatureC, canYouPlayGolf) = await ForecastFactory.CreateAsync(DateParserHelper.Parse(current.Date));
 				await responseStream.WriteAsync(
@@ -84,7 +87,8 @@ namespace DemoAPI.Server.Services
 		{
 			while (await responseStream.MoveNext())
 			{
-				ShowForecast(responseStream.Current);
+				var f = responseStream.Current;
+				ShowForecast(f.Date, f.TemperatureC, f.Summary, f.CanYouPlayGolf);
 			}
 		}
 
@@ -103,9 +107,9 @@ namespace DemoAPI.Server.Services
 			}
 		}
 
-		private void ShowForecast(PostForecastRequest result)
+		private void ShowForecast(string date, int temperature, string summary, bool canPlayGolf)
 		{
-			Console.WriteLine($"Date: {result.Date} Temperature: {result.TemperatureC} Summary: {result.Summary} Golfable? {(result.CanYouPlayGolf ? "Yes" : "No")}");
+			_logger.LogInformation($"Date: {date} Temperature: {temperature} Summary: {summary} Golfable? {(canPlayGolf ? "Yes" : "No")}");
 		}
 	}
 }
