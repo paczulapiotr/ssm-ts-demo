@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using DemoAPI.Common;
 using DemoAPI.Common.Models;
@@ -24,39 +22,37 @@ namespace GRPC.API.Controllers
         }
 
         [HttpGet("{quantity}")]
-        public Task<IEnumerable<WeatherForecast>> Get(int quantity)
+        public async IAsyncEnumerable<WeatherForecast> Get(int quantity)
         {
             var rng = new Random();
             var temperature = rng.Next(-20, 55);
-
-            return Task.FromResult(ForecastFactory.CreateMultiple(quantity).Select(f =>
+            await foreach (var f in ForecastFactory.CreateMultipleAsync(quantity))
             {
-                return new WeatherForecast
+                yield return new WeatherForecast
                 {
                     Date = f.date,
                     TemperatureC = f.temperatureC,
                     Summary = f.summary,
                     CanYouPlayGolf = f.canYouPlayGolf
                 };
-            }));
+            }
         }
 
 
         [HttpGet]
-        public Task<WeatherForecast> GetForDate(string date)
+        public async Task<WeatherForecast> GetForDate(string date)
         {
             var parsedDate = DateParserHelper.Parse(date);
 
-            var forecast = ForecastFactory.Create(parsedDate);
+            var forecast = await ForecastFactory.CreateAsync(parsedDate);
 
-            return Task.FromResult(
-                new WeatherForecast
-                {
-                    Date = forecast.date,
-                    TemperatureC = forecast.temperatureC,
-                    Summary = forecast.summary,
-                    CanYouPlayGolf = forecast.canYouPlayGolf
-                });
+            return new WeatherForecast
+            {
+                Date = forecast.date,
+                TemperatureC = forecast.temperatureC,
+                Summary = forecast.summary,
+                CanYouPlayGolf = forecast.canYouPlayGolf
+            };
         }
     }
 }

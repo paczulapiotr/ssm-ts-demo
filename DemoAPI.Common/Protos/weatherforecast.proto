@@ -9,6 +9,7 @@ service WeatherForecast {
 	rpc ForecastInfoServerStreaming (GetForecastRequest) returns (stream ForecastResult);
 	rpc ForecastInfoClientStreaming (stream PostForecastRequest) returns (google.protobuf.Empty);
 	rpc ForecastInfoBidirectionalStreaming (stream GetForecastForDateRequest) returns (stream ForecastResult);
+	rpc SpamForecastInfoBidirectionalStreaming (stream PostForecastRequest) returns (stream ForecastResult);
 }
 
 message GetForecastRequest  {

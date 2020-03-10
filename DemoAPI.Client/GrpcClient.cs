@@ -31,9 +31,9 @@ namespace DemoAPI.Client
             var weatherForecastClient = GetGrpcClient();
             var call = weatherForecastClient.ForecastInfoClientStreaming();
 
-            var forecasts = ForecastFactory.CreateMultiple(quantity);
+            var forecasts = ForecastFactory.CreateMultipleAsync(quantity);
             var stream = call.RequestStream;
-            foreach (var f in forecasts)
+            await foreach (var f in forecasts)
             {
                 await stream.WriteAsync(new PostForecastRequest
                 {
@@ -70,9 +70,8 @@ namespace DemoAPI.Client
 
             await requestStream.CompleteAsync();
             Console.WriteLine($"Bidirectional stream closed");
-
-
         }
+
         public static async Task GetForecastForDate(string date)
         {
             var weatherForecastClient = GetGrpcClient();
@@ -80,6 +79,41 @@ namespace DemoAPI.Client
                 new GetForecastForDateRequest { Date = date });
 
             ShowForecast(result);
+        }
+
+        public static Task SpamForecasts()
+        {
+            var weatherForecastClient = GetGrpcClient();
+            var call = weatherForecastClient.SpamForecastInfoBidirectionalStreaming();
+            var requestStream = call.RequestStream;
+            var responseStream = call.ResponseStream;
+            var readTask = ReadStream(responseStream);
+            var writeTask = WriteStream(requestStream);
+
+            return Task.WhenAll(writeTask, readTask);
+        }
+
+        private static async Task ReadStream(IAsyncStreamReader<ForecastResult> responseStream)
+        {
+            while (await responseStream.MoveNext())
+            {
+                ShowForecast(responseStream.Current);
+            }
+        }
+
+        private static async Task WriteStream(IClientStreamWriter<PostForecastRequest> requestStream)
+        {
+            await foreach (var f in ForecastFactory.CreateMultipleAsync(10))
+            {
+                await requestStream.WriteAsync(new PostForecastRequest
+                {
+                    Date = f.date,
+                    TemperatureC = f.temperatureC,
+                    Summary = f.summary,
+                    CanYouPlayGolf = f.canYouPlayGolf
+                });
+            }
+            await requestStream.CompleteAsync();
         }
 
         private static void ShowForecast(ForecastResult result)

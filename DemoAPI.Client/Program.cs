@@ -47,6 +47,10 @@ namespace DemoAPI.ClientAPI
                         GrpcBidirectionalForecast();
                         break;
 
+                    case ConsoleKey.D7:
+                        GrpcSpamForecasts();
+                        break;
+                        
                     default:
                         break;
                 }
@@ -67,6 +71,7 @@ namespace DemoAPI.ClientAPI
             Console.WriteLine("...");
             Console.WriteLine("5 - (gRPC) Client streaming");
             Console.WriteLine("6 - (gRPC) Bidirectional streaming");
+            Console.WriteLine("7 - (gRPC) SPAM Bidirectional streaming");
             Console.WriteLine("Q - for quitting");
         }
 
@@ -74,10 +79,9 @@ namespace DemoAPI.ClientAPI
         static void RESTForecastForDay() => ForecastForDayBase(RESTClient.GetForecastForDate);
         static void GrpcPostForecast() => FutureForecastBase(GrpcClient.PostForecast);
         static void GrpcBidirectionalForecast() => FutureForecastBase(GrpcClient.BidirectionalForecast);
-
         static void RESTFutureForecast() => FutureForecastBase(RESTClient.GetMultipleForecasts);
-
         static void GrpcForecastForDay() => ForecastForDayBase(GrpcClient.GetForecastForDate);
+        static void GrpcSpamForecasts() => MeasureTime(() => GrpcClient.SpamForecasts().Wait());
 
         private static void FutureForecastBase(Func<int, Task> clientAction)
         {
@@ -87,7 +91,7 @@ namespace DemoAPI.ClientAPI
 
             if (int.TryParse(dataQuantityString, out int result))
             {
-                MeasureTime(clientAction(result)).Wait();
+                MeasureTime(async () => await clientAction(result));
             }
             else
             {
@@ -100,13 +104,13 @@ namespace DemoAPI.ClientAPI
             Console.WriteLine($"Enter forecast date with format {Configuration.DateFormat}...");
             var date = Console.ReadLine();
             Console.WriteLine();
-            MeasureTime(clientAction(date)).Wait();
+            MeasureTime(async () => await clientAction(date));
         }
 
-        static async Task MeasureTime(Task action)
+        static void MeasureTime(Action action)
         {
             var timer = Stopwatch.StartNew();
-            await action;
+            action();
             timer.Stop();
             Console.WriteLine($"Time elapsed: {timer.ElapsedMilliseconds}ms");
         }

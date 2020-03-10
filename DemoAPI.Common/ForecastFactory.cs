@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DemoAPI.Common
@@ -12,19 +13,19 @@ namespace DemoAPI.Common
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        public static IEnumerable<(string date, string summary, int temperatureC, bool canYouPlayGolf)> CreateMultiple(int quantity)
+        public static async IAsyncEnumerable<(string date, string summary, int temperatureC, bool canYouPlayGolf)> CreateMultipleAsync(int quantity)
         {
             foreach (var index in Enumerable.Range(0, quantity))
             {
-                yield return Create(DateTime.Today.AddDays(index));
+                yield return await CreateAsync(DateTime.Today.AddDays(index));
             }
         }
 
-        public static (string date, string summary, int temperatureC, bool canYouPlayGolf) Create(DateTime date)
+        public static async Task<(string date, string summary, int temperatureC, bool canYouPlayGolf)> CreateAsync(DateTime date)
         {
             var rng = new Random();
             var temperature = rng.Next(-20, 55);
-            Task.Delay(300).Wait();
+            await Task.Delay(700);
             return
             (
             date: date.ToShortDateString(),
