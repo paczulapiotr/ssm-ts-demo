@@ -19,8 +19,9 @@ EXPOSE ${appPort}
 WORKDIR /app
 COPY --from=build /app/prod .
 
-
 # Configure SSL cert
+ENV certPassword 1234
+ENV useCert yes
 RUN openssl genrsa -des3 -passout pass:${certPassword} -out server.key 2048
 RUN openssl rsa -passin pass:${certPassword} -in server.key -out server.key
 RUN openssl req -sha256 -new -key server.key -out server.csr -subj '/CN=localhost'

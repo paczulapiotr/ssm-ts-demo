@@ -39,6 +39,14 @@ namespace DemoAPI.ClientAPI
                         GrpcForecastForDay();
                         break;
 
+                    case ConsoleKey.D5:
+                        GrpcPostForecast();
+                        break;
+
+                    case ConsoleKey.D6:
+                        GrpcBidirectionalForecast();
+                        break;
+
                     default:
                         break;
                 }
@@ -56,14 +64,18 @@ namespace DemoAPI.ClientAPI
             Console.WriteLine("2 - (gRPC) Forecast for several days");
             Console.WriteLine("3 - (REST) Forecast for a specific day");
             Console.WriteLine("4 - (gRPC) Forecast for a specific day");
+            Console.WriteLine("...");
+            Console.WriteLine("5 - (gRPC) Client streaming");
+            Console.WriteLine("6 - (gRPC) Bidirectional streaming");
             Console.WriteLine("Q - for quitting");
         }
 
-        static void GrpcFutureForecast() => FutureForecastBase(GrpcClient.GetMultipleForecasts);
+        static void GrpcFutureForecast() => FutureForecastBase(GrpcClient.GetForecast);
+        static void RESTForecastForDay() => ForecastForDayBase(RESTClient.GetForecastForDate);
+        static void GrpcPostForecast() => FutureForecastBase(GrpcClient.PostForecast);
+        static void GrpcBidirectionalForecast() => FutureForecastBase(GrpcClient.BidirectionalForecast);
 
         static void RESTFutureForecast() => FutureForecastBase(RESTClient.GetMultipleForecasts);
-
-        static void RESTForecastForDay() => ForecastForDayBase(RESTClient.GetForecastForDate);
 
         static void GrpcForecastForDay() => ForecastForDayBase(GrpcClient.GetForecastForDate);
 
@@ -75,7 +87,7 @@ namespace DemoAPI.ClientAPI
 
             if (int.TryParse(dataQuantityString, out int result))
             {
-                MeasureTime(() => clientAction(result).Wait());
+                MeasureTime(clientAction(result)).Wait();
             }
             else
             {
@@ -88,13 +100,13 @@ namespace DemoAPI.ClientAPI
             Console.WriteLine($"Enter forecast date with format {Configuration.DateFormat}...");
             var date = Console.ReadLine();
             Console.WriteLine();
-            MeasureTime(() => clientAction(date).Wait());
+            MeasureTime(clientAction(date)).Wait();
         }
 
-        static void MeasureTime(Action action)
+        static async Task MeasureTime(Task action)
         {
             var timer = Stopwatch.StartNew();
-            action();
+            await action;
             timer.Stop();
             Console.WriteLine($"Time elapsed: {timer.ElapsedMilliseconds}ms");
         }
