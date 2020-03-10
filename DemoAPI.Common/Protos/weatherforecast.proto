@@ -1,18 +1,29 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 option csharp_namespace = "DemoAPI.gRPC";
 
 service WeatherForecast {
-	rpc GetForecastInfo (GetForecastRequest) returns (stream ForecastResult);
-	rpc GetForecastForDateInfo (GetForecastForDateRequest) returns (ForecastResult);
+	rpc ForecastInfo (GetForecastForDateRequest) returns (ForecastResult);
+	rpc ForecastInfoServerStreaming (GetForecastRequest) returns (stream ForecastResult);
+	rpc ForecastInfoClientStreaming (stream PostForecastRequest) returns (google.protobuf.Empty);
+	rpc ForecastInfoBidirectionalStreaming (stream GetForecastForDateRequest) returns (stream ForecastResult);
 }
 
-message GetForecastRequest {
+message GetForecastRequest  {
     int32 forecastDaysQuantity = 1;
 }
 
-message GetForecastForDateRequest {
+message GetForecastForDateRequest{
     string date = 1;
+}
+
+message PostForecastRequest{
+    string date = 1;
+    string summary = 2;
+    int32 temperatureC = 3;
+    bool canYouPlayGolf = 4;
 }
 
 message ForecastResult {
