@@ -30,45 +30,48 @@ namespace DemoAPI.Client
         public static async Task PostForecast(int quantity)
         {
             var weatherForecastClient = GetGrpcClient();
-            var call = weatherForecastClient.ForecastInfoClientStreaming();
-
-            var forecasts = ForecastFactory.CreateMultipleAsync(quantity);
-            var stream = call.RequestStream;
-            await foreach (var f in forecasts)
+            using (var call = weatherForecastClient.ForecastInfoClientStreaming())
             {
-                await stream.WriteAsync(new PostForecastRequest
+                var forecasts = ForecastFactory.CreateMultipleAsync(quantity);
+                var stream = call.RequestStream;
+                await foreach (var f in forecasts)
                 {
-                    Date = f.date,
-                    TemperatureC = f.temperatureC,
-                    Summary = f.summary,
-                    CanYouPlayGolf = f.canYouPlayGolf
-                });
+                    await stream.WriteAsync(new PostForecastRequest
+                    {
+                        Date = f.date,
+                        TemperatureC = f.temperatureC,
+                        Summary = f.summary,
+                        CanYouPlayGolf = f.canYouPlayGolf
+                    });
+                }
+                await stream.CompleteAsync();
             }
-            await stream.CompleteAsync();
         }
 
         public static async Task BidirectionalForecast(int quantity)
         {
             var client = GetGrpcClient();
-            var call = client.ForecastInfoBidirectionalStreaming();
-            var requestStream = call.RequestStream;
-            var responseStream = call.ResponseStream;
-
-            foreach (var index in Enumerable.Range(0, quantity))
+            using (var call = client.ForecastInfoBidirectionalStreaming())
             {
-                var date = DateTime.Today.AddDays(index).ToString("dd/MM/yyyy");
-                await requestStream.WriteAsync(new GetForecastForDateRequest { Date = date });
+                var requestStream = call.RequestStream;
+                var responseStream = call.ResponseStream;
 
-                if (await responseStream.MoveNext())
+                foreach (var index in Enumerable.Range(0, quantity))
                 {
-                    var f = responseStream.Current;
-                    Console.WriteLine($"Date: {f.Date}, Temperature: {f.TemperatureC}, Summary: {f.Summary}, Golfable: {f.CanYouPlayGolf}");
+                    var date = DateTime.Today.AddDays(index).ToString("dd/MM/yyyy");
+                    await requestStream.WriteAsync(new GetForecastForDateRequest { Date = date });
+
+                    if (await responseStream.MoveNext())
+                    {
+                        var f = responseStream.Current;
+                        Console.WriteLine($"Date: {f.Date}, Temperature: {f.TemperatureC}, Summary: {f.Summary}, Golfable: {f.CanYouPlayGolf}");
+                    }
+
                 }
 
+                await requestStream.CompleteAsync();
+                Console.WriteLine($"Bidirectional stream closed");
             }
-
-            await requestStream.CompleteAsync();
-            Console.WriteLine($"Bidirectional stream closed");
         }
 
         public static async Task GetForecastForDate(string date)
@@ -80,16 +83,18 @@ namespace DemoAPI.Client
             ShowForecast(result);
         }
 
-        public static Task SpamForecasts()
+        public static async Task SpamForecasts()
         {
             var weatherForecastClient = GetGrpcClient();
-            var call = weatherForecastClient.SpamForecastInfoBidirectionalStreaming();
-            var requestStream = call.RequestStream;
-            var responseStream = call.ResponseStream;
-            var readTask = ReadStream(responseStream);
-            var writeTask = WriteStream(requestStream);
+            using (var call = weatherForecastClient.SpamForecastInfoBidirectionalStreaming())
+            {
+                var requestStream = call.RequestStream;
+                var responseStream = call.ResponseStream;
+                var readTask = ReadStream(responseStream);
+                var writeTask = WriteStream(requestStream);
 
-            return Task.WhenAll(writeTask, readTask);
+                await Task.WhenAll(writeTask, readTask);
+            }
         }
 
         private static async Task ReadStream(IAsyncStreamReader<ForecastResult> responseStream)
