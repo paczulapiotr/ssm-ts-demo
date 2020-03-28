@@ -94,7 +94,7 @@ namespace DemoAPI.Server.Services
 
 		private async Task WriteStream(IServerStreamWriter<ForecastResult> requestStream)
 		{
-			var forecasts = ForecastFactory.CreateMultipleAsync(10);
+			var forecasts = ForecastFactory.CreateMultipleAsync(10, 300);
 			await foreach (var f in forecasts)
 			{
 				await requestStream.WriteAsync(new ForecastResult

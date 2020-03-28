@@ -24,20 +24,21 @@ namespace DemoAPI.ClientAPI
                         break;
 
                     case ConsoleKey.D1:
-                        RESTFutureForecast();
-                        break;
-
-                    case ConsoleKey.D2:
-                        GrpcFutureForecast();
-                        break;
-
-                    case ConsoleKey.D3:
                         RESTForecastForDay();
                         break;
 
-                    case ConsoleKey.D4:
+                    case ConsoleKey.D2:
                         GrpcForecastForDay();
                         break;
+
+                    case ConsoleKey.D3:
+                        RESTFutureForecast();
+                        break;
+
+                    case ConsoleKey.D4:
+                        GrpcFutureForecast();
+                        break;
+
 
                     case ConsoleKey.D5:
                         GrpcPostForecast();
@@ -64,10 +65,12 @@ namespace DemoAPI.ClientAPI
         private static void DisplayMenuOptions()
         {
             Console.Clear();
-            Console.WriteLine("1 - (REST) Forecast for several days");
-            Console.WriteLine("2 - (gRPC) Forecast for several days");
-            Console.WriteLine("3 - (REST) Forecast for a specific day");
-            Console.WriteLine("4 - (gRPC) Forecast for a specific day");
+            Console.WriteLine(">>> Client for REST/gRPC demo <<<");
+            Console.WriteLine("Choose number:");
+            Console.WriteLine("1 - (REST) Forecast for a specific day");
+            Console.WriteLine("2 - (gRPC) Forecast for a specific day");
+            Console.WriteLine("3 - (REST) Forecast for several days");
+            Console.WriteLine("4 - (gRPC) Forecast for several days");
             Console.WriteLine("...");
             Console.WriteLine("5 - (gRPC) Forecast Client streaming");
             Console.WriteLine("6 - (gRPC) Forecast Bidirectional streaming");
